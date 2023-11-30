@@ -37,24 +37,3 @@ ggplot(Inflacion, aes(x = Año, y = Tasa_Inflación)) +
   )+
   scale_x_continuous(breaks = seq(min(Inflacion$Año), max(Inflacion$Año), by = 5))
 
-##########
-
-library(vars)
-
-# Crear una serie temporal con los datos de IPC por año
-ipc_ts <- ts(Inflacion$Tasa_Inflación, start = min(Inflacion$Año), frequency = 1)
-
-# Ajustar un modelo VAR con dos rezagos (lags)
-modelo_var <- arima(ipc_ts, order = c(1, 0, 0))
-
-# Hacer una predicción para los próximos 5 periodos
-prediccion_var <- predict(modelo_var, n.ahead = 5)
-
-# Mostrar los resultados de la predicción
-print(prediccion_var)
-
-# Graficar la serie temporal histórica junto con la predicción
-plot(ipc_ts, xlim = c(min(time(ipc_ts)), max(time(ipc_ts)) + 5), ylim = c(min(ipc_ts), max(ipc_ts) + 1),
-     xlab = "Año", ylab = "IPC Promedio", main = "Predicción con modelo ARIMA")
-lines(prediccion_var$pred, col = "red")  # Agregar la línea de la predicción
-legend("topleft", legend = c("Histórico", "Predicción"), col = c("black", "red"), lty = 1)
