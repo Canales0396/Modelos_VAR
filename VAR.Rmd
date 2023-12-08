@@ -1,0 +1,71 @@
+---
+title: "Modelos VAR"
+author: "Eduardo Canales"
+date: "2023-12-01"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+```{r}
+library(foreign)
+library(readxl)
+library(tseries)
+library(dplyr)
+library(ggplot2)
+##########################################################
+#        Datos históricos del Indice de Precios Al Consumidor
+#########################################################
+IPC<- read_excel("Datos/Índice de Precios al Consumidor.xlsx")
+# Convertir la fecha a año
+IPC <- IPC %>%
+  mutate(Año = lubridate::year(Fecha))
+
+# Calcular el promedio por año para el indicador Variación Interanual que es 
+## la inflación
+Inflacion<- IPC %>%
+  filter(Indicador == "Variación interanual") %>%
+  group_by(Año) %>%
+  summarise(Tasa_Inflación =round(mean(Valor),2))
+
+#########################################
+# Grafico para ver el comportamiento de la tasa de inflación 
+##########################
+# Graficar el IPC a lo largo de los años
+ggplot(Inflacion, aes(x = Año, y = Tasa_Inflación)) +
+  geom_line(color = "#87CEFA") +
+  geom_point(color = "#EE9A00", size = 1) +
+  geom_text(aes(label = round(Tasa_Inflación,2)), vjust = -0.5, hjust = -0.5, color = "black", size = 2.5)+
+  labs(title = "Gráfico del comportamiento de la tasa de inflación en Honduras periodo 1992-2023",
+       x = "Año", y = "Tasa de Inflación") +
+  theme_minimal()+
+  theme(
+    plot.title = element_text(family = "Arial", hjust = 0.5),
+    plot.background = element_rect(color = "black", size = 1, fill = "white"),
+    panel.background = element_rect(fill = "white"),
+    panel.grid = element_blank()
+  )+
+  scale_x_continuous(breaks = seq(min(Inflacion$Año), max(Inflacion$Año), by = 5))
+```
